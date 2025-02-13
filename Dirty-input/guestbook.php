@@ -1,6 +1,10 @@
 <?php
 
+
+// SS
 session_start();
+
+// Connectie
 $servername = "127.0.0.1";
 $username = "root"; // PAS DEZE AAN ALS DAT NODIG IS
 $password = ""; // PAS DEZE AAN ALS DAT NODIG IS
@@ -54,9 +58,9 @@ $token = $_SESSION['token'];
     <div class="body-container">
         <h1 class="heading">Gastenboek 'De lekkage'</h1>
         <form action="guestbook.php" method="post">
-            Email: <input type="email" name="email"><br />
+            <input type="email" name="email"><br />
             <input type="hidden" value="red" name="color">
-            Bericht: <textarea name="text" minlength="4"></textarea><br />
+            <textarea name="text" minlength="4"></textarea><br />
             <?php if (userIsAdmin($conn)) {
                 echo "<input type=\"hidden\" name=\"admin\" value=" . $_COOKIE['admin'] . "\">";
             } ?>
@@ -65,6 +69,8 @@ $token = $_SESSION['token'];
         </form>
         <hr />
         <?php
+
+        // Form handeling
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'];
             $text = $_POST['text'];
@@ -72,8 +78,14 @@ $token = $_SESSION['token'];
             $color = $_POST['color'];
 
             // Controleer of de user admin is en de kleur van het verborgen input veranderd is
-            if(!userIsAdmin($conn) && $color != 'red'){
+            if (!userIsAdmin($conn) && $color != 'red') {
                 $color = 'red';
+            }
+
+            // valideer email
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                echo "<script>alert('Geen valide email')</script>";
+                exit;
             }
 
 
@@ -110,9 +122,9 @@ $token = $_SESSION['token'];
         }
 
 
-        
-        
-        
+
+
+
         ?>
         <hr />
         <div class="disclosure-notice">
