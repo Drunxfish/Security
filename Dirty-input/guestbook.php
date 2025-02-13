@@ -6,10 +6,11 @@ session_start();
 
 // Connectie
 $servername = "127.0.0.1";
-$username = "root"; // PAS DEZE AAN ALS DAT NODIG IS
-$password = ""; // PAS DEZE AAN ALS DAT NODIG IS
+$username = "root";
+$password = "";
 $db = "leaky_guest_book";
 $conn;
+$_SESSION['admin'] = 1; # admin sessie
 
 
 try {
@@ -18,11 +19,55 @@ try {
     die("Failed to open database connection, did you start it and configure the credentials properly?");
 }
 
+// unieke sessie token genereren
 if (empty($_SESSION['token'])) {
     $_SESSION['token'] = bin2hex(random_bytes(32));
 }
 
 $token = $_SESSION['token'];
+
+
+// Form behandeling
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $text = $_POST['text'];
+    $admin = isset($_POST['admin']) ? 1 : 0;
+    $color = $_POST['color'];
+
+    // Controleer of de user admin is en de kleur van het verborgen input veranderd is
+    if (!userIsAdmin($conn) && $color != 'red') {
+        $color = 'red';
+    }
+
+    // valideer email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "<script>alert('Geen valide email')</script>";
+        exit;
+    }
+
+
+    // entries opnemen
+    $conn->query(
+        "INSERT INTO entries (email, color, admin, text) VALUES ('$email', '$color', '$admin', '$text');"
+    );
+}
+
+
+// controleer of de gebruker een admin is
+function userIsAdmin($conn)
+{
+    if (isset($_SESSION['admin'])) {
+        $result = $conn->query("SELECT cookie FROM `admin_cookies`");
+
+        // admin cookies vergelijken met admin sessie
+        foreach ($result as $row) {
+            if ($_SESSION['admin'] == $row['cookie']) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 ?>
 <html>
@@ -62,7 +107,7 @@ $token = $_SESSION['token'];
             <input type="hidden" value="red" name="color">
             <textarea name="text" minlength="4"></textarea><br />
             <?php if (userIsAdmin($conn)) {
-                echo "<input type=\"hidden\" name=\"admin\" value=" . $_COOKIE['admin'] . "\">";
+                echo "<input type=\"hidden\" name=\"admin\" value=" . $_SESSION['admin'] . "\">";
             } ?>
             <input type="hidden" name="token" value="<?php echo $token; ?>">
             <input type="submit">
@@ -70,61 +115,19 @@ $token = $_SESSION['token'];
         <hr />
         <?php
 
-        // Form handeling
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            $text = $_POST['text'];
-            $admin = isset($_POST['admin']) ? 1 : 0;
-            $color = $_POST['color'];
 
-            // Controleer of de user admin is en de kleur van het verborgen input veranderd is
-            if (!userIsAdmin($conn) && $color != 'red') {
-                $color = 'red';
-            }
-
-            // valideer email
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo "<script>alert('Geen valide email')</script>";
-                exit;
-            }
-
-
-            $conn->query(
-                "INSERT INTO `entries`(`email`, `color`, `admin`, `text`) 
-                                        VALUES ('$email', '$color', '$admin', '$text');"
-            );
-        }
-
-
+        // gegevens weergeven van entries
         $result = $conn->query("SELECT `email`, `text`, `color`, `admin` FROM `entries`");
         foreach ($result as $row) {
             print "<div style=\"color: " . $row['color'] . "\">Email: " . $row['email'];
+
+
+            // als admin bestaat krijg hij een Kroon
             if ($row['admin']) {
                 print '&#9812;';
             }
             print ": " . $row['text'] . "</div><br/>";
         }
-
-
-        function userIsAdmin($conn)
-        {
-            if (isset($_COOKIE['admin'])) {
-                $adminCookie = $_COOKIE['admin'];
-                $result = $conn->query("SELECT cookie FROM `admin_cookies`");
-
-                foreach ($result as $row) {
-                    if ($adminCookie === $row['cookie']) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-
-
-
-
         ?>
         <hr />
         <div class="disclosure-notice">
