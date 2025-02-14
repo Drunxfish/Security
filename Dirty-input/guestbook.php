@@ -10,7 +10,6 @@ $username = "root";
 $password = "";
 $db = "leaky_guest_book";
 $conn;
-$_SESSION['admin'] = 1; # admin sessie
 
 
 try {
@@ -31,13 +30,8 @@ $token = $_SESSION['token'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $text = $_POST['text'];
-    $admin = isset($_POST['admin']) ? 1 : 0;
     $color = $_POST['color'];
 
-    // Controleer of de user admin is en de kleur van het verborgen input veranderd is
-    if (!userIsAdmin($conn) && $color != 'red') {
-        $color = 'red';
-    }
 
     // valideer email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -48,26 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // entries opnemen
     $conn->query(
-        "INSERT INTO entries (email, color, admin, text) VALUES ('$email', '$color', '$admin', '$text');"
+        "INSERT INTO entries (email, color, text) VALUES ('$email', '$color', '$text');"
     );
 }
 
 
-// controleer of de gebruker een admin is
-function userIsAdmin($conn)
-{
-    if (isset($_SESSION['admin'])) {
-        $result = $conn->query("SELECT cookie FROM `admin_cookies`");
-
-        // admin cookies vergelijken met admin sessie
-        foreach ($result as $row) {
-            if ($_SESSION['admin'] == $row['cookie']) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 
 ?>
 <html>
@@ -106,9 +85,6 @@ function userIsAdmin($conn)
             <input type="email" name="email"><br />
             <input type="hidden" value="red" name="color">
             <textarea name="text" minlength="4"></textarea><br />
-            <?php if (userIsAdmin($conn)) {
-                echo "<input type=\"hidden\" name=\"admin\" value=" . $_SESSION['admin'] . "\">";
-            } ?>
             <input type="hidden" name="token" value="<?php echo $token; ?>">
             <input type="submit">
         </form>
