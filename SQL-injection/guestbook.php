@@ -40,10 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
-    // entries opnemen (onveilige manier)
-    $conn->query(
-        "INSERT INTO entries (email, color, text) VALUES ('$email', '$color', '$text');"
-    );
+    // entries opnemen (op een veilige manier)
+    $stmt = $conn->prepare("INSERT INTO entries (email, color, text) VALUES (?, ?, ?)");
+    $stmt = $stmt->execute([$email, $color, $text]);
 }
 
 

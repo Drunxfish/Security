@@ -1,7 +1,7 @@
 <?php
 $servername = "127.0.0.1";
-$username = "root"; // PAS DEZE AAN ALS DAT NODIG IS
-$password = "toor"; // PAS DEZE AAN ALS DAT NODIG IS
+$username = "root";
+$password = "toor";
 $db = "leaky_guest_book";
 $conn;
 try {
@@ -32,7 +32,6 @@ try {
         .heading {
             text-align: center;
         }
-
     </style>
 </head>
 
