@@ -21,8 +21,8 @@ Each assignment explores **security best practices, mitigation techniques, and r
 ✅ **Cross-Site Scripting (XSS)** – Understanding and preventing script injection.  
 ✅ **SQL Injection** – Securing database queries against malicious input.  
 ✅ **Dirty Input Handling** – Validating and sanitizing user input to prevent exploits.  
+✅ **CSRF Protection** – Implementing token-based security for form submissions.  
 
-🔜 **CSRF Protection** – Implementing token-based security for form submissions.  
 🔜 **Session Hijacking & Management** – Strengthening authentication and session handling.  
 🔜 **Password Hashing & Authentication** – Implementing secure login mechanisms.  
 🔜 **Secure File Uploads** – Preventing malicious file uploads and execution.  
