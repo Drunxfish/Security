@@ -22,6 +22,8 @@ Each assignment explores **security best practices, mitigation techniques, and r
 ✅ **SQL Injection** – Securing database queries against malicious input.  
 ✅ **Dirty Input Handling** – Validating and sanitizing user input to prevent exploits.  
 ✅ **CSRF Protection** – Implementing token-based security for form submissions.  
+✅ **Encryption** – Securing sensitive data using strong, up-to-date encryption algorithms in transit and at rest.
+
 
 🔜 **Session Hijacking & Management** – Strengthening authentication and session handling.  
 🔜 **Password Hashing & Authentication** – Implementing secure login mechanisms.  
